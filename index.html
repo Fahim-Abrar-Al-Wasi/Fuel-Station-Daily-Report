@@ -537,7 +537,7 @@
 
     <div class="btn-section">
       <button class="btn btn-success" onclick="calculateAll()">সকল হিসাব দেখান</button>
-      <button class="btn btn-danger" onclick="downloadPDF()">PDF ডাউনলোড করুন</button>
+      <button class="btn btn-danger" onclick="calculateAll();downloadPDF()">PDF ডাউনলোড করুন</button>
     </div>
 
   <!-- Signature Section -->
@@ -591,6 +591,27 @@
 
     // ✅ Clone the content
     const clone = original.cloneNode(true);
+
+    // Copy dynamic inputs to the clone
+    const originalInputs = original.querySelectorAll('input, select, textarea');
+    const cloneInputs = clone.querySelectorAll('input, select, textarea');
+    originalInputs.forEach((input, i) => {
+      if (cloneInputs[i]) {
+        if (input.type === 'checkbox' || input.type === 'radio') {
+          cloneInputs[i].checked = input.checked;
+        } else {
+          cloneInputs[i].value = input.value;
+        }
+      }
+    });
+
+    // Replace input fields with their actual values (for better PDF rendering)
+    clone.querySelectorAll('input').forEach(input => {
+      const span = document.createElement('span');
+      span.textContent = input.value;
+      input.parentNode.replaceChild(span, input);
+    });
+
     clone.id = 'report-clone';
     clone.classList.add('temp-pdf'); // Add your custom PDF styling class
 
