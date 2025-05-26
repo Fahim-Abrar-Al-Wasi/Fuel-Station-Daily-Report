@@ -612,6 +612,13 @@
       input.parentNode.replaceChild(span, input);
     });
 
+    // Replace <select> elements with their selected value
+    clone.querySelectorAll('select').forEach(select => {
+      const span = document.createElement('span');
+      span.textContent = select.options[select.selectedIndex]?.text || '';
+      select.parentNode.replaceChild(span, select);
+    });
+    
     clone.id = 'report-clone';
     clone.classList.add('temp-pdf'); // Add your custom PDF styling class
 
@@ -930,9 +937,10 @@
     const dueCollectionTotal = parseFloat(document.getElementById('due-collection-total').innerText) || 0;
     const dueGivenTotal = parseFloat(document.getElementById('due-given-total').innerText) || 0;
     const otherCostTotal = parseFloat(document.getElementById('other-cost-total').innerText) || 0;
+    const MobilTotal = parseFloat(document.getElementById('mobil-sale-total').innerText) || 0;
 
-    const totalWithoutOthers = dieselMoney + petrolMoney + dueCollectionTotal - dueGivenTotal;
-    const totalWithOthers = dieselMoney + petrolMoney + dueCollectionTotal - dueGivenTotal - otherCostTotal;
+    const totalWithoutOthers = dieselMoney + petrolMoney + dueCollectionTotal - dueGivenTotal + MobilTotal;
+    const totalWithOthers = dieselMoney + petrolMoney + dueCollectionTotal - dueGivenTotal - otherCostTotal + MobilTotal;
 
     document.getElementById('without-others').innerText = totalWithoutOthers.toFixed(2);
     document.getElementById('total-money').innerText = totalWithOthers.toFixed(2);
