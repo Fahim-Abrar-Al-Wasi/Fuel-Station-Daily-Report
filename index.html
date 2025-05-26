@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>বিসমিল্লাহ ফিলিং স্টেশন রিপোর্ট</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: #f2f2f2;
+      font-family: 'Segoe UI', sans-serif;
+      padding-bottom: 50px;
+    }
+    header {
+      background: linear-gradient(to right, #a71616, #222ba2, #a71616);
+      color: white;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    header h1 {
+      font-size: 2.5rem;
+      font-weight: bold;
+    }
+    .section-title {
+      background-color: #cce5ff;
+      padding: 10px;
+      font-weight: bold;
+      margin-top: 20px;
+      border-left: 5px solid #004d99;
+    }
+
+    /* ডিজেল হিসাব section container */
+    #diesel-machines {
+      background-color: #eef7ff; /* Light blue background */
+      border: 1px solid #b3d7ff;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+
+    /* Each diesel machine card */
+    .diesel-machine {
+      background-color: #ffffff;
+      border: 1px solid #6fa8dc; /* Medium blue border */
+      border-radius: 8px;
+      padding: 15px;
+      box-shadow: 0 2px 6px rgba(0, 123, 255, 0.1); /* Soft blue shadow */
+    }
+
+    /* Labels and inputs */
+    .diesel-machine label {
+      font-weight: 600;
+      display: block;
+      margin-top: 8px;
+      color: #003366; /* Dark blue text */
+    }
+
+    .diesel-machine input.form-control {
+      margin-bottom: 10px;
+      border-radius: 6px;
+      border: 1px solid #999;
+    }
+
+    /* Highlighted result values */
+    #total-diesel,
+    #diesel-money {
+      font-weight: 700;
+      color: #0056b3; /* Stronger blue for totals */
+    }
+
+    /* Diesel price input */
+    #diesel-price {
+      border: 2px solid #66a3ff;
+      border-radius: 6px;
+      padding: 5px;
+    }
+
+    /* Section titles */
+    .section-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #000000;
+      margin-bottom: 10px;
+      border-left: 5px solid #007bff;
+      padding-left: 10px;
+    }
+
+    /* 🔲 Narrow, bordered petrol section */
+    .petrol-section.narrow-box {
+      background-color: #eef7ff;
+      border: 1px solid #b3d7ff;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      max-width: 400px;
+    }
+
+    /* 🚧 Highlight for petrol price input outside the section */
+    .highlight-box {
+      border: 2px dashed #6fa8dc;
+      padding: 12px;
+      border-radius: 8px;
+      background-color: #f0fffa;
+    }
+
+    /* ✏️ Input + Label styles */
+    .petrol-section label,
+    .highlight-box label {
+      font-weight: 600;
+      color: #003366;
+    }
+    .petrol-section .form-control,
+    .highlight-box .form-control {
+      border: 1px solid #6fa8dc;
+      border-radius: 5px;
+    }
+    #petrol-litre, #petrol-money {
+      font-weight: bold;
+      color: #0056b3;
+    }
+
+    #due-given-table th,
+    #due-collection-table th,
+    #other-cost-table th,
+    #mobil-sale-table th,
+    #mobil-stock-table th {
+      background-color: #28a745; /* Bootstrap success green */
+      color: white;
+      text-align: center;
+    }
+    .btn-section {
+      margin-top: 30px;
+    }
+
+    .custom-input {
+      border: 2px solid #222ba2;
+      transition: 0.3s ease;
+      padding-left: 15px;
+    }
+
+    .custom-input:focus {
+      border-color: #a71616;
+    }
+
+    label.form-label {
+      font-size: 1.1rem;
+      color: black!important;
+    }
+
+    /* Table Adjustments */
+    #dip-table {
+      background-color: #fff;
+      margin-top: 10px;
+    }
+
+    #dip-table th,
+    #dip-table td {
+      vertical-align: middle;
+      text-align: center;
+    }
+
+    /* Input Style */
+    #dip-table input.form-control {
+      text-align: center;
+      padding: 6px;
+      font-size: 1rem;
+    }
+
+    /* Buttons */
+    .btn-success {
+      font-size: 1rem;
+      padding: 6px 16px;
+      border-radius: 4px;
+    }
+
+    /* Result Area */
+    #dip-results {
+      background-color: #eef7ff;
+      border: 1px solid #b3d7ff;
+      color: #003366;
+      border-radius: 5px;
+      padding: 15px;
+      margin-top: 15px;
+      font-size: 1.05rem;
+      line-height: 1.8;
+    }
+    /* Clean PDF look during capture */
+    /* Styles applied only when exporting PDF */
+  /* Styles applied only when exporting PDF */
+    .temp-pdf * {
+      color: #000 !important;
+      background: #fff !important;
+      box-shadow: none !important;
+      text-shadow: none !important;
+      border-color: #000 !important;
+    }
+
+    .temp-pdf {
+      width: 1230px !important;           /* Force desktop width */
+      max-width: none !important;
+      min-width: 1230px !important;
+      box-sizing: border-box !important;
+      font-size: 16px !important;
+      line-height: 1.6 !important;
+      display: block !important;
+      padding: 30px !important;
+      background: #fff !important;
+    }
+
+    /* Optional: Prevent mobile responsiveness */
+    .temp-pdf * {
+      max-width: 100% !important;
+      width: auto !important;
+    }
+
+    /* Table formatting */
+    .temp-pdf table {
+      border-collapse: collapse !important;
+      width: 100% !important;
+    }
+
+    .temp-pdf th,
+    .temp-pdf td {
+      border: 1px solid #000 !important;
+      padding: 4px !important;
+      font-size: 11pt !important;
+    }
+
+    /* Hide interactive or dynamic elements */
+    .temp-pdf input,
+    .temp-pdf select,
+    .temp-pdf button,
+    .temp-pdf .btn,
+    .temp-pdf .highlight-box,
+    .temp-pdf .btn-section {
+      display: none !important;
+    }
+
+    /* Force override for responsive elements */
+    .temp-pdf .row,
+    .temp-pdf .col,
+    .temp-pdf .container,
+    .temp-pdf .section {
+      width: 100% !important;
+      float: none !important;
+      display: block !important;
+      flex: none !important;
+    }
+
+
+
+    /* Hide control buttons when printing or capturing PDF */
+    @media print {
+      .btn-section,
+      input,
+      select,
+      button {
+        display: none !important;
+      }
+
+      .container {
+        background: #fff !important;
+        color: #000 !important;
+      }
+    }
+
+
+  </style>
+</head>
+<body>
+  <header>
+    <h1>বিসমিল্লাহ ফিলিং স্টেশন</h1>
+    <p>দৈনিক জ্বালানি হিসাব রিপোর্ট</p>
+  </header>
+<div id="report-area" class="printable">
+  <div id="report-area" class="container mt-5 printable">
+    <div class="row justify-content-center" id="date-time" style="padding-top: 20px;">
+      <div class="col-md-3 mb-4">
+        <label class="form-label fw-bold text-success">তারিখ</label>
+        <input type="date" class="form-control shadow-sm rounded-pill custom-input">
+      </div>
+      <div class="col-md-3 mb-4">
+        <label class="form-label fw-bold text-success">শিফট</label>
+        <select class="form-control shadow-sm rounded-pill custom-input">
+          <option>দিন</option>
+          <option>রাত</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="section-title">ডিজেল হিসাব</div>
+    <div class="row" id="diesel-machines">
+      <!-- ডিজেল মেশিন D1 to D4 -->
+      <div class="col-md-3 mb-3 diesel-machine">
+        <label>D1: বর্তমান রিডিং</label>
+        <input type="number" class="form-control current">
+        <label>পূর্বের রিডিং</label>
+        <input type="number" class="form-control previous">
+        <p>লিটার: <span class="litre">0</span></p>
+      </div>
+      <div class="col-md-3 mb-3 diesel-machine">
+        <label>D2: বর্তমান রিডিং</label>
+        <input type="number" class="form-control current">
+        <label>পূর্বের রিডিং</label>
+        <input type="number" class="form-control previous">
+        <p>লিটার: <span class="litre">0</span></p>
+      </div>
+      <div class="col-md-3 mb-3 diesel-machine">
+        <label>D3: বর্তমান রিডিং</label>
+        <input type="number" class="form-control current">
+        <label>পূর্বের রিডিং</label>
+        <input type="number" class="form-control previous">
+        <p>লিটার: <span class="litre">0</span></p>
+      </div>
+      <div class="col-md-3 mb-3 diesel-machine">
+        <label>D4: বর্তমান রিডিং</label>
+        <input type="number" class="form-control current">
+        <label>পূর্বের রিডিং</label>
+        <input type="number" class="form-control previous">
+        <p>লিটার: <span class="litre">0</span></p>
+      </div>
+    </div>
+    <p><strong>মোট ডিজেল বিক্রয়:</strong> <span id="total-diesel">0</span> লিটার</p>
+
+    <div class="highlight-box col-md-3 mb-3 mt-3">
+      <label>ডিজেল মূল্য (লিটার প্রতি)</label>
+      <input type="number" class="form-control" id="diesel-price">
+    </div>
+
+    <p><strong>ডিজেল বিক্রয় থেকে মোট টাকা:</strong> <span id="diesel-money">0</span> টাকা</p>
+
+    <div class="mb-3">
+      <button class="btn btn-primary" onclick="calculateDieselTotal()">মোট হিসাব দেখান</button>
+    </div>
+
+    <div class="section-title">পেট্রোল হিসাব</div>
+
+    <!-- 🚗 Narrow bordered section for readings -->
+    <div class="petrol-section narrow-box row">
+      <div class="col-md-12 mb-3">
+        <label>P1: বর্তমান রিডিং</label>
+        <input type="number" class="form-control" id="petrol-current">
+        <label>পূর্বের রিডিং</label>
+        <input type="number" class="form-control" id="petrol-previous">
+        <p>লিটার: <span id="petrol-litre">0</span></p>
+      </div>
+    </div>
+    
+    <!-- 💸 Outside but highlighted petrol price input -->
+    <div class="highlight-box col-md-3 mb-3 mt-3">
+      <label>পেট্রোল মূল্য (লিটার প্রতি)</label>
+      <input type="number" class="form-control" id="petrol-price">
+    </div>
+    
+    <!-- 💰 Final petrol money display -->
+    <p><strong>পেট্রোল বিক্রয় থেকে মোট টাকা:</strong> <span id="petrol-money">0</span> টাকা</p>
+    
+    <div class="mb-3">
+      <button class="btn btn-primary" onclick="calculatePetrolTotal()">মোট হিসাব দেখান</button>
+    </div>
+
+
+<!-- Add inside your <body> where you had the placeholders -->
+  <!----------------------------------------------->
+  <!----------------------------------------------->
+  <!----------------------- Due Given Section------------------------>
+  <div class="section-title">বাকি প্রদান</div>
+  <table class="table table-bordered" id="due-given-table">
+    <thead>
+      <tr>
+        <th>নং</th>
+        <th>বিবরণ</th>
+        <th>টাকা</th>
+        <th>অপশন</th>
+      </tr>
+    </thead>
+    <tbody id="due-given-body">
+      <!-- Dynamic rows will be added here -->
+    </tbody>
+  </table>
+  
+  <div class="mb-3">
+    <button class="btn btn-primary" onclick="addDueGivenRow()">নতুন সারি যোগ করুন</button>
+    <button class="btn btn-success" onclick="calculateDueGivenTotal()">মোট দেখান</button>
+  </div>
+  
+  <p><strong>মোট বাকি প্রদান:</strong> <span id="due-given-total">0</span> টাকা</p>
+  <!----------------------------------------------->
+  <!----------------------------------------------->
+  <!--------------------Due Collection Section--------------------------->
+  <div class="section-title">বাকি আদায়</div>
+  <table class="table table-bordered" id="due-collection-table">
+    <thead>
+      <tr>
+        <th>নং</th>
+        <th>বিবরণ</th>
+        <th>টাকা</th>
+        <th>অপশন</th>
+      </tr>
+    </thead>
+    <tbody id="due-collection-body">
+      <!-- Dynamic rows will be added here -->
+    </tbody>
+  </table>
+  
+  <div class="mb-3">
+    <button class="btn btn-primary" onclick="addDueCollectionRow()">নতুন সারি যোগ করুন</button>
+    <button class="btn btn-success" onclick="calculateDueCollectionTotal()">মোট দেখান</button>
+  </div>
+  
+  <p><strong>মোট বাকি আদায়:</strong> <span id="due-collection-total">0</span> টাকা</p>
+
+  <!----------------------------------------------->
+  <!----------------------------------------------->
+  <!-----------------------Other Cost Section------------------------>
+  <div class="section-title">অন্যান্য খরচ</div>
+  <table class="table table-bordered" id="other-cost-table">
+    <thead>
+      <tr>
+        <th>নং</th>
+        <th>বিবরণ</th>
+        <th>টাকা</th>
+        <th>অপশন</th>
+      </tr>
+    </thead>
+    <tbody id="other-cost-body">
+      <!-- Dynamic rows will be added here -->
+    </tbody>
+  </table>
+  
+  <div class="mb-3">
+    <button class="btn btn-primary" onclick="addOtherCostRow()">নতুন সারি যোগ করুন</button>
+    <button class="btn btn-success" onclick="calculateOtherCostTotal()">মোট দেখান</button>
+  </div>
+  
+  <p><strong>মোট অন্যান্য খরচ:</strong> <span id="other-cost-total">0</span> টাকা</p>
+
+  <!----------------------------------------------->
+  <!----------------------------------------------->
+  <!------------------Mobil sales Section----------------------------->
+  <div class="section-title">মবিল বিক্রয়</div>
+
+  <table class="table table-bordered" id="mobil-sale-table">
+    <thead>
+      <tr>
+        <th>নং</th>
+        <th>বিবরণ</th>
+        <th>টাকা</th>
+        <th>অপশন</th>
+      </tr>
+    </thead>
+    <tbody id="mobil-sale-body">
+      <!-- Dynamic rows will be added here -->
+    </tbody>
+  </table>
+  
+  <div class="mb-3">
+    <button class="btn btn-primary" onclick="addMobilRow()">নতুন সারি যোগ করুন</button>
+    <button class="btn btn-success" onclick="calculateMobilTotal()">মোট দেখান</button>
+  </div>
+  
+  <p><strong>মোট মবিল বিক্রয়:</strong> <span id="mobil-sale-total">0</span> টাকা</p>
+
+    <!----------------------------------------------->
+  <!----------------------------------------------->
+  <!-------------------Dip Section---------------------------->
+  <!-- ডিপ পরিমাপ Section -->
+  <div class="section-title mt-4">ডিপ পরিমাপ</div>
+
+  <table class="table table-bordered" id="dip-table">
+    <thead class="table-success">
+      <tr>
+        <th>ট্যাংক</th>
+        <th>স্কেল রিডিং</th>
+        <th>সমতুল্য তেল</th>
+      </tr>
+    </thead>
+    <tbody id="dip-body">
+      <tr>
+        <td>D1</td>
+        <td><input type="number" class="form-control" id="d1Scale"></td>
+        <td><input type="number" class="form-control" id="d1Oil"></td>
+      </tr>
+      <tr>
+        <td>D2</td>
+        <td><input type="number" class="form-control" id="d2Scale"></td>
+        <td><input type="number" class="form-control" id="d2Oil"></td>
+      </tr>
+      <tr>
+        <td>P1</td>
+        <td><input type="number" class="form-control" id="p1Scale"></td>
+        <td><input type="number" class="form-control" id="p1Oil"></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="mb-3">
+    <button class="btn btn-success" onclick="calculateDip()">মোট দেখান</button>
+  </div>
+
+  <div class="alert alert-info" id="dip-results" style="font-weight: bold; font-size: 1.0rem; padding: 8px 12px; line-height: 1.8; width: 50%;">
+    মোট ডিজেল অবশিষ্ট: 0<br>
+    মোট পেট্রোল অবশিষ্ট: 0<br>
+    বিক্রয় যোগ্য ডিজেল: 0<br>
+    বিক্রয় যোগ্য পেট্রোল: 0
+  </div>
+  <!----------------------------------------------->
+  <!----------------------------------------------->
+  <!--------------------Mobil Stock Section--------------------------->  
+  <div class="section-title">মবিল মজুদ</div>
+
+  <table class="table table-bordered" id="mobil-stock-table">
+    <thead>
+      <tr>
+        <th>নং</th>
+        <th>বিবরণ</th>
+        <th>পরিমান</th>
+        <th>অপশন</th>
+      </tr>
+    </thead>
+    <tbody id="mobil-stock-body">
+      <!-- Dynamic rows will be added here -->
+    </tbody>
+  </table>
+  
+  <div class="mb-3">
+    <button class="btn btn-primary" onclick="addMobilStockRow()">নতুন সারি যোগ করুন</button>
+  </div>
+  
+  <!-- Summary Section -->
+  <div class="section-title">সারসংক্ষেপ</div>
+  <p><strong>অন্যান্য খরচ বাদে মোট টাকা:</strong> <span id="without-others">0</span> টাকা</p>
+  <p><strong>মোট টাকা:</strong> <span id="total-money">0</span> টাকা</p>
+  
+
+    <div class="btn-section">
+      <button class="btn btn-success" onclick="calculateAll()">সকল হিসাব দেখান</button>
+      <button class="btn btn-danger" onclick="downloadPDF()">PDF ডাউনলোড করুন</button>
+    </div>
+
+  <!-- Signature Section -->
+  <div class="mt-5" id="signature-section">
+    <hr style="border-top: 1px dashed #000; margin-top: 50px;">
+    <div class="mt-4 text-end" style="font-size: 16px;">
+      <p>স্বাক্ষর: _________________________</p>
+    </div>
+  </div>
+
+  </div>
+</div>
+  <script>
+    function calculateDieselTotal() {
+      const dieselMachines = document.querySelectorAll('.diesel-machine');
+      let totalDiesel = 0;
+
+      dieselMachines.forEach(section => {
+        const current = parseFloat(section.querySelector('.current').value) || 0;
+        const previous = parseFloat(section.querySelector('.previous').value) || 0;
+        const litre = Math.max(0, current - previous);
+        section.querySelector('.litre').innerText = litre;
+        totalDiesel += litre;
+      });
+
+      document.getElementById('total-diesel').innerText = totalDiesel;
+
+      const dieselPrice = parseFloat(document.getElementById('diesel-price').value) || 0;
+      const dieselMoney = totalDiesel * dieselPrice;
+      document.getElementById('diesel-money').innerText = dieselMoney.toFixed(2);
+      calculateDieselPetrolDueSummary();
+    }
+
+    function calculatePetrolTotal() {
+      const petrolCurrent = parseFloat(document.getElementById('petrol-current').value) || 0;
+      const petrolPrevious = parseFloat(document.getElementById('petrol-previous').value) || 0;
+      const petrolLitre = Math.max(0, petrolCurrent - petrolPrevious);
+      document.getElementById('petrol-litre').innerText = petrolLitre;
+
+      const petrolPrice = parseFloat(document.getElementById('petrol-price').value) || 0;
+      const petrolMoney = petrolLitre * petrolPrice;
+      document.getElementById('petrol-money').innerText = petrolMoney.toFixed(2);
+      calculateDieselPetrolDueSummary();
+    }
+  
+
+  async function downloadPDF() {
+    const { jsPDF } = window.jspdf;
+
+    const original = document.getElementById('report-area');
+
+    // ✅ Clone the content
+    const clone = original.cloneNode(true);
+    clone.id = 'report-clone';
+    clone.classList.add('temp-pdf'); // Add your custom PDF styling class
+
+    // ✅ Style the clone to ensure proper rendering
+    Object.assign(clone.style, {
+      position: 'absolute',
+      top: '0',
+      left: '0',
+      width: '1024px',           // Desktop width
+      minHeight: 'auto',
+      background: '#fff',
+      padding: '30px',
+      zIndex: '-1',
+      opacity: '1',
+      visibility: 'visible',
+      display: 'block',
+      boxSizing: 'border-box',
+      transform: 'none',
+      pointerEvents: 'none',
+      userSelect: 'none',
+    });
+
+    // ✅ Append to body for layout rendering
+    document.body.appendChild(clone);
+
+    // ✅ Wait for layout to render
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    // ✅ Generate canvas using html2canvas
+    const canvas = await html2canvas(clone, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: '#ffffff'
+    });
+
+    // ✅ Convert canvas to image
+    const imgData = canvas.toDataURL('image/jpeg', 1.0);
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = pdf.internal.pageSize.getHeight();
+
+    const imgProps = pdf.getImageProperties(imgData);
+    const imgHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+    let heightLeft = imgHeight;
+    let position = 0;
+
+    // ✅ First page
+    pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeight);
+    heightLeft -= pdfHeight;
+
+    // ✅ Add more pages if content overflows
+    while (heightLeft > 0) {
+      position = heightLeft - imgHeight;
+      pdf.addPage();
+      pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeight);
+      heightLeft -= pdfHeight;
+    }
+
+    // ✅ Name the file based on date input if available
+    const dateInput = document.querySelector('#date-time input[type="date"]');
+    const dateValue = dateInput?.value || null;
+    const fileName = dateValue ? `report_${dateValue}.pdf` : "daily_report.pdf";
+
+    pdf.save(fileName);
+
+    // ✅ Clean up
+    document.body.removeChild(clone);
+  }
+
+
+    //Due Given Calculation
+    let dueGivenRowCount = 0;
+
+    function addDueGivenRow() {
+      dueGivenRowCount++;
+      const tableBody = document.getElementById('due-given-body');
+      const row = document.createElement('tr');
+      row.setAttribute('data-row-id','given-' + dueGivenRowCount);
+
+      row.innerHTML = `
+        <td class="row-number">${dueGivenRowCount}</td>
+        <td><input type="text" class="form-control" placeholder="বিবরণ"></td>
+        <td><input type="number" class="form-control due-given-amount" placeholder="টাকা" value=""></td>
+        <td><button class="btn btn-danger btn-sm" onclick="deleteDueGivenRow(${dueGivenRowCount})">মুছুন</button></td>
+      `;
+
+      tableBody.appendChild(row);
+      updateDueGivenRowNumbers();
+    }
+
+    function deleteDueGivenRow(id) {
+      const row = document.querySelector(`tr[data-row-id='given-${id}']`);
+      if (row) {
+        row.remove();
+      }
+      updateDueGivenRowNumbers(); // 🔁 Renumber rows
+      calculateDueGivenTotal();   // 💰 Update total
+    }
+
+    function updateDueGivenRowNumbers() {
+      const rows = document.querySelectorAll('#due-given-body tr');
+      rows.forEach((row, index) => {
+        row.querySelector('.row-number').innerText = index + 1;
+      });
+    }
+
+    function calculateDueGivenTotal() 
+    {
+      const amounts = document.querySelectorAll('#due-given-body .due-given-amount');
+      let total = 0;
+      amounts.forEach(input => {
+        total += parseFloat(input.value) || 0;
+      });
+      document.getElementById('due-given-total').innerText = total.toFixed(2);
+      calculateDieselPetrolDueSummary();
+    }
+
+    //Due Collection Calculation
+    let dueCollectionRowCount = 0;
+
+    function addDueCollectionRow() {
+      dueCollectionRowCount++;
+      const tableBody = document.getElementById('due-collection-body');
+      const row = document.createElement('tr');
+      row.setAttribute('data-row-id','collection-' + dueCollectionRowCount);
+
+      row.innerHTML = `
+        <td class="row-number">${dueCollectionRowCount}</td>
+        <td><input type="text" class="form-control" placeholder="বিবরণ"></td>
+        <td><input type="number" class="form-control due-collection-amount" placeholder="টাকা" value=""></td>
+        <td><button class="btn btn-danger btn-sm" onclick="deleteDueCollectionRow(${dueCollectionRowCount})">মুছুন</button></td>
+      `;
+
+      tableBody.appendChild(row);
+      updateDueCollectionRowNumbers();
+    }
+
+    function deleteDueCollectionRow(id) {
+      const row = document.querySelector(`tr[data-row-id='collection-${id}']`);
+      if (row) {
+        row.remove();
+      }
+      updateDueCollectionRowNumbers(); // 🔁 Renumber rows
+      calculateDueCollectionTotal();   // 💰 Update total
+    }
+
+    function updateDueCollectionRowNumbers() {
+      const rows = document.querySelectorAll('#due-collection-body tr');
+      rows.forEach((row, index) => {
+        row.querySelector('.row-number').innerText = index + 1;
+      });
+    }
+
+    function calculateDueCollectionTotal() 
+    {
+      const amounts = document.querySelectorAll('#due-collection-body .due-collection-amount');
+      let total = 0;
+      amounts.forEach(input => {
+        total += parseFloat(input.value) || 0;
+      });
+      document.getElementById('due-collection-total').innerText = total.toFixed(2);
+      calculateDieselPetrolDueSummary();
+    }
+
+    //Other Cost Calculation
+    let otherCostRowCount = 0;
+
+    function addOtherCostRow() {
+      otherCostRowCount++;
+      const tableBody = document.getElementById('other-cost-body');
+      const row = document.createElement('tr');
+      row.setAttribute('data-row-id','other-' + otherCostRowCount);
+
+      row.innerHTML = `
+        <td class="row-number">${otherCostRowCount}</td>
+        <td><input type="text" class="form-control" placeholder="বিবরণ"></td>
+        <td><input type="number" class="form-control other-cost-amount" placeholder="টাকা" value=""></td>
+        <td><button class="btn btn-danger btn-sm" onclick="deleteOtherCostRow(${otherCostRowCount})">মুছুন</button></td>
+      `;
+
+      tableBody.appendChild(row);
+      updateOtherCostRowNumbers();
+    }
+
+    function deleteOtherCostRow(id) {
+      const row = document.querySelector(`tr[data-row-id='other-${id}']`);
+      if (row) {
+        row.remove();
+      }
+      updateOtherCostRowNumbers(); // 🔁 Renumber rows
+      calculateOtherCostTotal();   // 💰 Update total
+    }
+
+    function updateOtherCostRowNumbers() {
+      const rows = document.querySelectorAll('#other-cost-body tr');
+      rows.forEach((row, index) => {
+        row.querySelector('.row-number').innerText = index + 1;
+      });
+    }
+
+    function calculateOtherCostTotal() 
+    {
+      const amounts = document.querySelectorAll('#other-cost-body .other-cost-amount');
+      let total = 0;
+      amounts.forEach(input => {
+        total += parseFloat(input.value) || 0;
+      });
+      document.getElementById('other-cost-total').innerText = total.toFixed(2);
+      calculateDieselPetrolDueSummary();
+    }
+    //Mobil Calculation
+    let mobilRowCount = 0;
+
+    function addMobilRow() {
+      mobilRowCount++;
+      const tableBody = document.getElementById('mobil-sale-body');
+      const row = document.createElement('tr');
+      row.setAttribute('data-row-id','mobil-' + mobilRowCount);
+
+      row.innerHTML = `
+        <td class="row-number">${mobilRowCount}</td>
+        <td><input type="text" class="form-control" placeholder="বিবরণ"></td>
+        <td><input type="number" class="form-control mobil-sale-amount" placeholder="টাকা" value=""></td>
+        <td><button class="btn btn-danger btn-sm" onclick="deleteMobilRow(${mobilRowCount})">মুছুন</button></td>
+      `;
+
+      tableBody.appendChild(row);
+      updateMobilRowNumbers();
+    }
+
+    function deleteMobilRow(id) {
+      const row = document.querySelector(`tr[data-row-id='mobil-${id}']`);
+      if (row) {
+        row.remove();
+      }
+      updateMobilRowNumbers(); // 🔁 Renumber rows
+      calculateMobilTotal();   // 💰 Update total
+    }
+
+    function updateMobilRowNumbers() {
+      const rows = document.querySelectorAll('#mobil-sale-body tr');
+      rows.forEach((row, index) => {
+        row.querySelector('.row-number').innerText = index + 1;
+      });
+    }
+
+    function calculateMobilTotal() 
+    {
+      const amounts = document.querySelectorAll('#mobil-sale-body .mobil-sale-amount');
+      let total = 0;
+      amounts.forEach(input => {
+        total += parseFloat(input.value) || 0;
+      });
+      document.getElementById('mobil-sale-total').innerText = total.toFixed(2);
+      calculateDieselPetrolDueSummary();
+    }
+    //Mobil Stock
+    let mobilStockRowCount = 0;
+
+    function addMobilStockRow() {
+      mobilStockRowCount++;
+      const tableBody = document.getElementById('mobil-stock-body');
+      const row = document.createElement('tr');
+      row.setAttribute('data-row-id','stock-' + mobilStockRowCount);
+
+      row.innerHTML = `
+        <td class="row-number">${mobilStockRowCount}</td>
+        <td><input type="text" class="form-control" placeholder="বিবরণ"></td>
+        <td><input type="number" class="form-control mobil-stock-amount" placeholder="পরিমান" value=""></td>
+        <td><button class="btn btn-danger btn-sm" onclick="deleteMobilStockRow(${mobilStockRowCount})">মুছুন</button></td>
+      `;
+
+      tableBody.appendChild(row);
+      updateMobilStockRowNumbers();
+    }
+
+    function deleteMobilStockRow(id) {
+      const row = document.querySelector(`tr[data-row-id='stock-${id}']`);
+      if (row) {
+        row.remove();
+      }
+      updateMobilStockRowNumbers(); // 🔁 Renumber rows
+    }
+
+    function updateMobilStockRowNumbers() {
+      const rows = document.querySelectorAll('#mobil-stock-body tr');
+      rows.forEach((row, index) => {
+        row.querySelector('.row-number').innerText = index + 1;
+      });
+    }
+
+    function calculateDip() {
+      const d1Oil = parseFloat(document.getElementById("d1Oil").value) || 0;
+      const d2Oil = parseFloat(document.getElementById("d2Oil").value) || 0;
+      const p1Oil = parseFloat(document.getElementById("p1Oil").value) || 0;
+
+      const totalDiesel = d1Oil + d2Oil;
+      const totalPetrol = p1Oil;
+
+      const sellableDiesel = totalDiesel - 1000;
+      const sellablePetrol = totalPetrol - 800;
+
+      document.getElementById("dip-results").innerHTML = `
+        মোট ডিজেল অবশিষ্ট: ${totalDiesel}<br>
+        মোট পেট্রোল অবশিষ্ট: ${totalPetrol}<br>
+        বিক্রয় যোগ্য ডিজেল: ${sellableDiesel < 0 ? 0 : sellableDiesel}<br>
+        বিক্রয় যোগ্য পেট্রোল: ${sellablePetrol < 0 ? 0 : sellablePetrol}
+      `;
+    }
+
+  function calculateDieselPetrolDueSummary() {
+
+    const dieselMoney = parseFloat(document.getElementById('diesel-money').innerText) || 0;
+    const petrolMoney = parseFloat(document.getElementById('petrol-money').innerText) || 0;
+    const dueCollectionTotal = parseFloat(document.getElementById('due-collection-total').innerText) || 0;
+    const dueGivenTotal = parseFloat(document.getElementById('due-given-total').innerText) || 0;
+    const otherCostTotal = parseFloat(document.getElementById('other-cost-total').innerText) || 0;
+
+    const totalWithoutOthers = dieselMoney + petrolMoney + dueCollectionTotal - dueGivenTotal;
+    const totalWithOthers = dieselMoney + petrolMoney + dueCollectionTotal - dueGivenTotal - otherCostTotal;
+
+    document.getElementById('without-others').innerText = totalWithoutOthers.toFixed(2);
+    document.getElementById('total-money').innerText = totalWithOthers.toFixed(2);
+  }
+
+  function calculateAll() {
+    calculateDieselTotal();
+    calculatePetrolTotal();
+    calculateDueGivenTotal();
+    calculateDueCollectionTotal();
+    calculateOtherCostTotal();
+    calculateMobilTotal();
+    calculateDip();
+  }
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+</body>
+</html>
