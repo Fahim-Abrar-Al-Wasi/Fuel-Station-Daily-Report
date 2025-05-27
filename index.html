@@ -125,7 +125,8 @@
     #due-collection-table th,
     #other-cost-table th,
     #mobil-sale-table th,
-    #mobil-stock-table th {
+    #mobil-stock-table th,
+    #pump-expenses-table th {
       background-color: #28a745; /* Bootstrap success green */
       color: white;
       text-align: center;
@@ -437,6 +438,31 @@
   
   <p><strong>মোট অন্যান্য খরচ:</strong> <span id="other-cost-total">0</span> টাকা</p>
 
+    <!----------------------------------------------->
+  <!----------------------------------------------->
+  <!-----------------------Pump Expenses Section------------------------>
+  <div class="section-title">পাম্প খরচ</div>
+  <table class="table table-bordered" id="pump-expenses-table">
+    <thead>
+      <tr>
+        <th>নং</th>
+        <th>বিবরণ</th>
+        <th>টাকা</th>
+        <th>অপশন</th>
+      </tr>
+    </thead>
+    <tbody id="pump-expenses-body">
+      <!-- Dynamic rows will be added here -->
+    </tbody>
+  </table>
+  
+  <div class="mb-3">
+    <button class="btn btn-primary" onclick="addPumpExpensesRow()">নতুন সারি যোগ করুন</button>
+    <button class="btn btn-success" onclick="calculatePumpExpensesTotal()">মোট দেখান</button>
+  </div>
+  
+  <p><strong>মোট পাম্প খরচ:</strong> <span id="pump-expenses-total">0</span> টাকা</p>
+
   <!----------------------------------------------->
   <!----------------------------------------------->
   <!------------------Mobil sales Section----------------------------->
@@ -533,8 +559,11 @@
   <div class="section-title">সারসংক্ষেপ</div>
   <p><strong>অন্যান্য খরচ বাদে মোট টাকা:</strong> <span id="without-others">0</span> টাকা</p>
   <p><strong>মোট টাকা:</strong> <span id="total-money">0</span> টাকা</p>
+  <p><strong>মোট অবশিষ্ট টাকা:</strong> <span id="total-money-after-pump-expenses">0</span> টাকা</p>
+  <p><p><strong>ব্যাংকে জমা:</strong></p></p>
+  <p><p><strong>পূর্বের শিফট হতে প্রাপ্ত টাকা:</strong></p></p>
+  <p><p><strong>বর্তমান শিফট হতে প্রাপ্ত টাকা:</strong></p></p>
   
-
     <div class="btn-section">
       <button class="btn btn-success" onclick="calculateAll()">সকল হিসাব দেখান</button>
       <button class="btn btn-danger" onclick="calculateAll();downloadPDF()">PDF ডাউনলোড করুন</button>
@@ -558,12 +587,14 @@
       dieselMachines.forEach(section => {
         const current = parseFloat(section.querySelector('.current').value) || 0;
         const previous = parseFloat(section.querySelector('.previous').value) || 0;
-        const litre = Math.max(0, current - previous);
-        section.querySelector('.litre').innerText = litre;
+        let litre = Math.max(0, current - previous);
+        litre = parseFloat(litre.toFixed(2));
+        section.querySelector('.litre').innerText = litre.toFixed(2);
         totalDiesel += litre;
       });
 
-      document.getElementById('total-diesel').innerText = totalDiesel;
+      totalDiesel = parseFloat(totalDiesel.toFixed(2));
+      document.getElementById('total-diesel').innerText = totalDiesel.toFixed(2);
 
       const dieselPrice = parseFloat(document.getElementById('diesel-price').value) || 0;
       const dieselMoney = totalDiesel * dieselPrice;
@@ -574,11 +605,12 @@
     function calculatePetrolTotal() {
       const petrolCurrent = parseFloat(document.getElementById('petrol-current').value) || 0;
       const petrolPrevious = parseFloat(document.getElementById('petrol-previous').value) || 0;
-      const petrolLitre = Math.max(0, petrolCurrent - petrolPrevious);
-      document.getElementById('petrol-litre').innerText = petrolLitre;
+      let petrolLitre = Math.max(0, petrolCurrent - petrolPrevious);
+      petrolLitre = parseFloat(petrolLitre.toFixed(2));
+      document.getElementById('petrol-litre').innerText = petrolLitre.toFixed(2);
 
       const petrolPrice = parseFloat(document.getElementById('petrol-price').value) || 0;
-      const petrolMoney = petrolLitre * petrolPrice;
+      const petrolMoney = parseFloat((petrolLitre * petrolPrice).toFixed(2));
       document.getElementById('petrol-money').innerText = petrolMoney.toFixed(2);
       calculateDieselPetrolDueSummary();
     }
@@ -680,8 +712,11 @@
 
     // ✅ Name the file based on date input if available
     const dateInput = document.querySelector('#date-time input[type="date"]');
-    const dateValue = dateInput?.value || null;
-    const fileName = dateValue ? `report_${dateValue}.pdf` : "daily_report.pdf";
+    const shiftSelect = document.querySelector('#date-time select');
+    const dateValue = dateInput?.value || "no-date";
+    const shiftValue = shiftSelect?.value || "no-shift";
+
+    const fileName = `report_${dateValue}_${shiftValue}.pdf`;
 
     pdf.save(fileName);
 
@@ -830,6 +865,55 @@
       document.getElementById('other-cost-total').innerText = total.toFixed(2);
       calculateDieselPetrolDueSummary();
     }
+
+    //Pump Expenses Calculation
+    let pumpExpensesRowCount = 0;
+
+    function addPumpExpensesRow() {
+      pumpExpensesRowCount++;
+      const tableBody = document.getElementById('pump-expenses-body');
+      const row = document.createElement('tr');
+      row.setAttribute('data-row-id','pump-' + pumpExpensesRowCount);
+
+      row.innerHTML = `
+        <td class="row-number">${pumpExpensesRowCount}</td>
+        <td><input type="text" class="form-control" placeholder="বিবরণ"></td>
+        <td><input type="number" class="form-control pump-expenses-amount" placeholder="টাকা" value=""></td>
+        <td><button class="btn btn-danger btn-sm" onclick="deletePumpExpensesRow(${pumpExpensesRowCount})">মুছুন</button></td>
+      `;
+
+      tableBody.appendChild(row);
+      updatePumpExpensesRowNumbers();
+    }
+
+    function deletePumpExpensesRow(id) {
+      const row = document.querySelector(`tr[data-row-id='pump-${id}']`);
+      if (row) {
+        row.remove();
+      }
+      updatePumpExpensesRowNumbers(); // 🔁 Renumber rows
+      calculatePumpExpensesTotal();   // 💰 Update total
+    }
+
+    function updatePumpExpensesRowNumbers() {
+      const rows = document.querySelectorAll('#pump-expenses-body tr');
+      rows.forEach((row, index) => {
+        row.querySelector('.row-number').innerText = index + 1;
+      });
+    }
+
+    function calculatePumpExpensesTotal() 
+    {
+      const amounts = document.querySelectorAll('#pump-expenses-body .pump-expenses-amount');
+      let total = 0;
+      amounts.forEach(input => {
+        total += parseFloat(input.value) || 0;
+      });
+      document.getElementById('pump-expenses-total').innerText = total.toFixed(2);
+      calculateDieselPetrolDueSummary();
+    }
+
+
     //Mobil Calculation
     let mobilRowCount = 0;
 
@@ -938,12 +1022,15 @@
     const dueGivenTotal = parseFloat(document.getElementById('due-given-total').innerText) || 0;
     const otherCostTotal = parseFloat(document.getElementById('other-cost-total').innerText) || 0;
     const MobilTotal = parseFloat(document.getElementById('mobil-sale-total').innerText) || 0;
+    const PumpExpenses = parseFloat(document.getElementById('pump-expenses-total').innerText) || 0;
 
     const totalWithoutOthers = dieselMoney + petrolMoney + dueCollectionTotal - dueGivenTotal + MobilTotal;
     const totalWithOthers = dieselMoney + petrolMoney + dueCollectionTotal - dueGivenTotal - otherCostTotal + MobilTotal;
+    const totalWithPumpExpenses = dieselMoney + petrolMoney + dueCollectionTotal - dueGivenTotal - otherCostTotal + MobilTotal - PumpExpenses;
 
     document.getElementById('without-others').innerText = totalWithoutOthers.toFixed(2);
     document.getElementById('total-money').innerText = totalWithOthers.toFixed(2);
+    document.getElementById('total-money-after-pump-expenses').innerText = totalWithPumpExpenses.toFixed(2);
   }
 
   function calculateAll() {
@@ -952,6 +1039,7 @@
     calculateDueGivenTotal();
     calculateDueCollectionTotal();
     calculateOtherCostTotal();
+    calculatePumpExpensesTotal();
     calculateMobilTotal();
     calculateDip();
   }
