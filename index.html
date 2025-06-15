@@ -1031,6 +1031,70 @@
     document.getElementById('oil-money').innerText = oilMoney.toFixed(2);
   }
 
+  // Save data to localStorage when calculateAll() runs
+  function saveData() {
+    const dieselMachines = document.querySelectorAll('.diesel-machine');
+    const dieselData = [];
+    dieselMachines.forEach(section => {
+      dieselData.push({
+        current: section.querySelector('.current').value,
+        previous: section.querySelector('.previous').value
+      });
+    });
+
+    const petrolCurrent = document.getElementById('petrol-current').value;
+    const petrolPrevious = document.getElementById('petrol-previous').value;
+
+    const mobilStock = {
+      total: document.getElementById('totalQty').value,
+      super4t: document.getElementById('super4tQty').value,
+      power: document.getElementById('powerQty').value,
+      brake: document.getElementById('brakeQty').value,
+      loose: document.getElementById('looseQty').value
+    };
+
+    const data = {
+      diesel: dieselData,
+      petrol: { current: petrolCurrent, previous: petrolPrevious },
+      mobil: mobilStock
+    };
+
+    localStorage.setItem('pumpData', JSON.stringify(data));
+  }
+
+  // Load data when page starts
+  function loadData() {
+    const saved = localStorage.getItem('pumpData');
+    if (saved) {
+      const data = JSON.parse(saved);
+
+      // Diesel readings: shift current to previous
+      const dieselMachines = document.querySelectorAll('.diesel-machine');
+      data.diesel.forEach((item, index) => {
+        const section = dieselMachines[index];
+        section.querySelector('.previous').value = item.current || '';
+        section.querySelector('.current').value = '';
+      });
+
+      // Petrol: shift current to previous
+      document.getElementById('petrol-previous').value = data.petrol.current || '';
+      document.getElementById('petrol-current').value = '';
+
+      // Mobil stock
+      document.getElementById('totalQty').value = data.mobil.total || '';
+      document.getElementById('super4tQty').value = data.mobil.super4t || '';
+      document.getElementById('powerQty').value = data.mobil.power || '';
+      document.getElementById('brakeQty').value = data.mobil.brake || '';
+      document.getElementById('looseQty').value = data.mobil.loose || '';
+    }
+  }
+
+  // Call loadData() when page loads
+  window.onload = function() {
+    loadData();
+  };
+
+
   function calculateAll() {
     calculateDieselTotal();
     calculatePetrolTotal();
@@ -1040,6 +1104,7 @@
     calculatePumpExpensesTotal();
     calculateMobilTotal();
     calculateDip();
+    saveData();  // 🔥 Save data after calculations
   }
   </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
