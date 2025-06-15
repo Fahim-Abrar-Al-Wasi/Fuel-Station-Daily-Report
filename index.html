@@ -116,7 +116,7 @@
       border: 1px solid #6fa8dc;
       border-radius: 5px;
     }
-    #petrol-litre, #petrol-money {
+    #petrol-litre, #petrol-money, #oil-money {
       font-weight: bold;
       color: #0056b3;
     }
@@ -125,7 +125,6 @@
     #due-collection-table th,
     #other-cost-table th,
     #mobil-sale-table th,
-    #mobil-stock-table th,
     #pump-expenses-table th {
       background-color: #28a745; /* Bootstrap success green */
       color: white;
@@ -151,19 +150,23 @@
     }
 
     /* Table Adjustments */
-    #dip-table {
+    #dip-table,
+    #mobil-stock-table {
       background-color: #fff;
       margin-top: 10px;
     }
 
     #dip-table th,
-    #dip-table td {
+    #dip-table td,
+    #mobil-stock-table th,
+    #mobil-stock-table td {
       vertical-align: middle;
       text-align: center;
     }
 
     /* Input Style */
-    #dip-table input.form-control {
+    #dip-table input.form-control,
+    #mobil-stock-table input.form-control {
       text-align: center;
       padding: 6px;
       font-size: 1rem;
@@ -203,7 +206,7 @@
       max-width: none !important;
       min-width: 1230px !important;
       box-sizing: border-box !important;
-      font-size: 16px !important;
+      font-size: 27px !important;
       line-height: 1.6 !important;
       display: block !important;
       padding: 30px !important;
@@ -226,7 +229,7 @@
     .temp-pdf td {
       border: 1px solid #000 !important;
       padding: 4px !important;
-      font-size: 11pt !important;
+      font-size: 15pt !important;
     }
 
     /* Hide interactive or dynamic elements */
@@ -361,6 +364,9 @@
     <div class="mb-3">
       <button class="btn btn-primary" onclick="calculatePetrolTotal()">মোট হিসাব দেখান</button>
     </div>
+
+    <!-- 💰 Final oil money display -->
+    <p><p><strong>তেল বিক্রয় হতে মোট টাকা:</strong> <span id="oil-money">0</span> টাকা</p></p>
 
 
 <!-- Add inside your <body> where you had the placeholders -->
@@ -538,22 +544,35 @@
   <div class="section-title">মবিল মজুদ</div>
 
   <table class="table table-bordered" id="mobil-stock-table">
-    <thead>
+    <thead class="table-success">
       <tr>
-        <th>নং</th>
         <th>বিবরণ</th>
         <th>পরিমান</th>
-        <th>অপশন</th>
       </tr>
     </thead>
     <tbody id="mobil-stock-body">
-      <!-- Dynamic rows will be added here -->
+      <tr>
+        <td>টোটাল</td>
+        <td><input type="number" class="form-control" id="totalQty"></td>
+      </tr>
+      <tr>
+        <td>সুপার 4T</td>
+        <td><input type="number" class="form-control" id="super4tQty"></td>
+      </tr>
+      <tr>
+        <td>পাওয়ার</td>
+        <td><input type="number" class="form-control" id="powerQty"></td>
+      </tr>
+      <tr>
+        <td>ব্রেক</td>
+        <td><input type="number" class="form-control" id="brakeQty"></td>
+      </tr>
+      <tr>
+        <td>লুজ</td>
+        <td><input type="number" class="form-control" id="looseQty"></td>
+      </tr>
     </tbody>
   </table>
-  
-  <div class="mb-3">
-    <button class="btn btn-primary" onclick="addMobilStockRow()">নতুন সারি যোগ করুন</button>
-  </div>
   
   <!-- Summary Section -->
   <div class="section-title">সারসংক্ষেপ</div>
@@ -971,40 +990,6 @@
       document.getElementById('mobil-sale-total').innerText = total.toFixed(2);
       calculateDieselPetrolDueSummary();
     }
-    //Mobil Stock
-    let mobilStockRowCount = 0;
-
-    function addMobilStockRow() {
-      mobilStockRowCount++;
-      const tableBody = document.getElementById('mobil-stock-body');
-      const row = document.createElement('tr');
-      row.setAttribute('data-row-id','stock-' + mobilStockRowCount);
-
-      row.innerHTML = `
-        <td class="row-number">${mobilStockRowCount}</td>
-        <td><input type="text" class="form-control" placeholder="বিবরণ"></td>
-        <td><input type="number" class="form-control mobil-stock-amount" placeholder="পরিমান" value=""></td>
-        <td><button class="btn btn-danger btn-sm" onclick="deleteMobilStockRow(${mobilStockRowCount})">মুছুন</button></td>
-      `;
-
-      tableBody.appendChild(row);
-      updateMobilStockRowNumbers();
-    }
-
-    function deleteMobilStockRow(id) {
-      const row = document.querySelector(`tr[data-row-id='stock-${id}']`);
-      if (row) {
-        row.remove();
-      }
-      updateMobilStockRowNumbers(); // 🔁 Renumber rows
-    }
-
-    function updateMobilStockRowNumbers() {
-      const rows = document.querySelectorAll('#mobil-stock-body tr');
-      rows.forEach((row, index) => {
-        row.querySelector('.row-number').innerText = index + 1;
-      });
-    }
 
     function calculateDip() {
       const d1Oil = parseFloat(document.getElementById("d1Oil").value) || 0;
@@ -1038,10 +1023,12 @@
     const totalWithoutOthers = dieselMoney + petrolMoney + dueCollectionTotal - dueGivenTotal + MobilTotal;
     const totalWithOthers = dieselMoney + petrolMoney + dueCollectionTotal - dueGivenTotal - otherCostTotal + MobilTotal;
     const totalWithPumpExpenses = dieselMoney + petrolMoney + dueCollectionTotal - dueGivenTotal - otherCostTotal + MobilTotal - PumpExpenses;
+    const oilMoney = dieselMoney + petrolMoney;
 
     document.getElementById('without-others').innerText = totalWithoutOthers.toFixed(2);
     document.getElementById('total-money').innerText = totalWithOthers.toFixed(2);
     document.getElementById('total-money-after-pump-expenses').innerText = totalWithPumpExpenses.toFixed(2);
+    document.getElementById('oil-money').innerText = oilMoney.toFixed(2);
   }
 
   function calculateAll() {
