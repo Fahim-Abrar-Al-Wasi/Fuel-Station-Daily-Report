@@ -169,7 +169,7 @@
     #mobil-stock-table input.form-control {
       text-align: center;
       padding: 6px;
-      font-size: 1rem;
+      font-size: 1.2rem;
     }
 
     /* Buttons */
@@ -187,7 +187,7 @@
       border-radius: 5px;
       padding: 15px;
       margin-top: 15px;
-      font-size: 1.05rem;
+      font-size: 1.1rem;
       line-height: 1.8;
     }
     /* Clean PDF look during capture */
@@ -253,7 +253,10 @@
       flex: none !important;
     }
 
-
+    .temp-pdf #dip-results {
+      font-size: 20px !important; /* 👈 Increase font size for PDF export */
+      line-height: 2 !important;
+    }
 
     /* Hide control buttons when printing or capturing PDF */
     @media print {
@@ -370,6 +373,51 @@
 
 
 <!-- Add inside your <body> where you had the placeholders -->
+
+
+  <!-------------------Dip Section---------------------------->
+  <!-- ডিপ পরিমাপ Section -->
+  <div class="section-title mt-4">ডিপ পরিমাপ</div>
+
+  <table class="table table-bordered" id="dip-table">
+    <thead class="table-success">
+      <tr>
+        <th>ট্যাংক</th>
+        <th>স্কেল রিডিং</th>
+        <th>সমতুল্য তেল</th>
+      </tr>
+    </thead>
+    <tbody id="dip-body">
+      <tr>
+        <td>D1</td>
+        <td><input type="number" class="form-control" id="d1Scale"></td>
+        <td><input type="number" class="form-control" id="d1Oil"></td>
+      </tr>
+      <tr>
+        <td>D2</td>
+        <td><input type="number" class="form-control" id="d2Scale"></td>
+        <td><input type="number" class="form-control" id="d2Oil"></td>
+      </tr>
+      <tr>
+        <td>P1</td>
+        <td><input type="number" class="form-control" id="p1Scale"></td>
+        <td><input type="number" class="form-control" id="p1Oil"></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="mb-3">
+    <button class="btn btn-success" onclick="calculateDip()">মোট দেখান</button>
+  </div>
+
+  <div class="alert alert-info" id="dip-results" style="font-weight: bold; font-size: 1.0rem; padding: 8px 12px; line-height: 1.8; width: 50%;">
+    মোট ডিজেল অবশিষ্ট: 0<br>
+    মোট পেট্রোল অবশিষ্ট: 0<br>
+    বিক্রয় যোগ্য ডিজেল: 0<br>
+    বিক্রয় যোগ্য পেট্রোল: 0
+  </div>
+  <!----------------------------------------------->
+  <!----------------------------------------------->
   <!----------------------------------------------->
   <!----------------------------------------------->
   <!----------------------- Due Given Section------------------------>
@@ -445,31 +493,7 @@
   <p><strong>মোট অন্যান্য খরচ:</strong> <span id="other-cost-total">0</span> টাকা</p>
 
     <!----------------------------------------------->
-  <!----------------------------------------------->
-  <!-----------------------Pump Expenses Section------------------------>
-  <div class="section-title">পাম্প খরচ</div>
-  <table class="table table-bordered" id="pump-expenses-table">
-    <thead>
-      <tr>
-        <th>নং</th>
-        <th>বিবরণ</th>
-        <th>টাকা</th>
-        <th>অপশন</th>
-      </tr>
-    </thead>
-    <tbody id="pump-expenses-body">
-      <!-- Dynamic rows will be added here -->
-    </tbody>
-  </table>
-  
-  <div class="mb-3">
-    <button class="btn btn-primary" onclick="addPumpExpensesRow()">নতুন সারি যোগ করুন</button>
-    <button class="btn btn-success" onclick="calculatePumpExpensesTotal()">মোট দেখান</button>
-  </div>
-  
-  <p><strong>মোট পাম্প খরচ:</strong> <span id="pump-expenses-total">0</span> টাকা</p>
 
-  <!----------------------------------------------->
   <!----------------------------------------------->
   <!------------------Mobil sales Section----------------------------->
   <div class="section-title">মবিল বিক্রয়</div>
@@ -497,49 +521,33 @@
 
     <!----------------------------------------------->
   <!----------------------------------------------->
-  <!-------------------Dip Section---------------------------->
-  <!-- ডিপ পরিমাপ Section -->
-  <div class="section-title mt-4">ডিপ পরিমাপ</div>
 
-  <table class="table table-bordered" id="dip-table">
-    <thead class="table-success">
+    <!----------------------------------------------->
+  <!-----------------------Pump Expenses Section------------------------>
+  <div class="section-title">পাম্প খরচ</div>
+  <table class="table table-bordered" id="pump-expenses-table">
+    <thead>
       <tr>
-        <th>ট্যাংক</th>
-        <th>স্কেল রিডিং</th>
-        <th>সমতুল্য তেল</th>
+        <th>নং</th>
+        <th>বিবরণ</th>
+        <th>টাকা</th>
+        <th>অপশন</th>
       </tr>
     </thead>
-    <tbody id="dip-body">
-      <tr>
-        <td>D1</td>
-        <td><input type="number" class="form-control" id="d1Scale"></td>
-        <td><input type="number" class="form-control" id="d1Oil"></td>
-      </tr>
-      <tr>
-        <td>D2</td>
-        <td><input type="number" class="form-control" id="d2Scale"></td>
-        <td><input type="number" class="form-control" id="d2Oil"></td>
-      </tr>
-      <tr>
-        <td>P1</td>
-        <td><input type="number" class="form-control" id="p1Scale"></td>
-        <td><input type="number" class="form-control" id="p1Oil"></td>
-      </tr>
+    <tbody id="pump-expenses-body">
+      <!-- Dynamic rows will be added here -->
     </tbody>
   </table>
-
+  
   <div class="mb-3">
-    <button class="btn btn-success" onclick="calculateDip()">মোট দেখান</button>
+    <button class="btn btn-primary" onclick="addPumpExpensesRow()">নতুন সারি যোগ করুন</button>
+    <button class="btn btn-success" onclick="calculatePumpExpensesTotal()">মোট দেখান</button>
   </div>
+  
+  <p><strong>মোট পাম্প খরচ:</strong> <span id="pump-expenses-total">0</span> টাকা</p>
 
-  <div class="alert alert-info" id="dip-results" style="font-weight: bold; font-size: 1.0rem; padding: 8px 12px; line-height: 1.8; width: 50%;">
-    মোট ডিজেল অবশিষ্ট: 0<br>
-    মোট পেট্রোল অবশিষ্ট: 0<br>
-    বিক্রয় যোগ্য ডিজেল: 0<br>
-    বিক্রয় যোগ্য পেট্রোল: 0
-  </div>
   <!----------------------------------------------->
-  <!----------------------------------------------->
+  
   <!--------------------Mobil Stock Section--------------------------->  
   <div class="section-title">মবিল মজুদ</div>
 
@@ -617,7 +625,7 @@
 
       const dieselPrice = parseFloat(document.getElementById('diesel-price').value) || 0;
       const dieselMoney = totalDiesel * dieselPrice;
-      document.getElementById('diesel-money').innerText = dieselMoney.toFixed(2);
+      document.getElementById('diesel-money').innerText = dieselMoney.toFixed(0);
       calculateDieselPetrolDueSummary();
     }
 
@@ -630,7 +638,7 @@
 
       const petrolPrice = parseFloat(document.getElementById('petrol-price').value) || 0;
       const petrolMoney = parseFloat((petrolLitre * petrolPrice).toFixed(2));
-      document.getElementById('petrol-money').innerText = petrolMoney.toFixed(2);
+      document.getElementById('petrol-money').innerText = petrolMoney.toFixed(0);
       calculateDieselPetrolDueSummary();
     }
   
@@ -1025,10 +1033,10 @@
     const totalWithPumpExpenses = dieselMoney + petrolMoney + dueCollectionTotal - dueGivenTotal - otherCostTotal + MobilTotal - PumpExpenses;
     const oilMoney = dieselMoney + petrolMoney;
 
-    document.getElementById('without-others').innerText = totalWithoutOthers.toFixed(2);
-    document.getElementById('total-money').innerText = totalWithOthers.toFixed(2);
-    document.getElementById('total-money-after-pump-expenses').innerText = totalWithPumpExpenses.toFixed(2);
-    document.getElementById('oil-money').innerText = oilMoney.toFixed(2);
+    document.getElementById('without-others').innerText = totalWithoutOthers.toFixed(0);
+    document.getElementById('total-money').innerText = totalWithOthers.toFixed(0);
+    document.getElementById('total-money-after-pump-expenses').innerText = totalWithPumpExpenses.toFixed(0);
+    document.getElementById('oil-money').innerText = oilMoney.toFixed(0);
   }
 
   // Save data to localStorage when calculateAll() runs
@@ -1044,6 +1052,9 @@
 
     const petrolCurrent = document.getElementById('petrol-current').value;
     const petrolPrevious = document.getElementById('petrol-previous').value;
+    
+    const dieselPrice = document.getElementById('diesel-price').value;
+    const petrolPrice = document.getElementById('petrol-price').value;
 
     const mobilStock = {
       total: document.getElementById('totalQty').value,
@@ -1056,6 +1067,7 @@
     const data = {
       diesel: dieselData,
       petrol: { current: petrolCurrent, previous: petrolPrevious },
+      prices: { diesel: dieselPrice, petrol: petrolPrice },
       mobil: mobilStock
     };
 
@@ -1086,6 +1098,12 @@
       document.getElementById('powerQty').value = data.mobil.power || '';
       document.getElementById('brakeQty').value = data.mobil.brake || '';
       document.getElementById('looseQty').value = data.mobil.loose || '';
+
+      // Restore prices
+      if (data.prices) {
+        document.getElementById('diesel-price').value = data.prices.diesel || '';
+        document.getElementById('petrol-price').value = data.prices.petrol || '';
+      }
     }
   }
 
